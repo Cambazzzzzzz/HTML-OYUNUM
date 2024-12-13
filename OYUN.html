@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daire Toplama</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(to bottom, #74ebd5, #9face6);
+        }
+
+        #gameCanvas {
+            border: 2px solid #333;
+            background: #fff;
+            cursor: pointer;
+        }
+
+        #score {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        #gameOver {
+            position: absolute;
+            display: none;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 36px;
+            color: #333;
+        }
+
+        #gameOver button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 20px;
+            border: none;
+            background-color: #74ebd5;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #gameOver button:hover {
+            background-color: #9face6;
+        }
+    </style>
+</head>
+<body>
+    <div id="score">Score: 0</div>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div id="gameOver">
+        <div>Game Over!</div>
+        <button onclick="startGame()">Restart</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById("gameCanvas");
+        const ctx = canvas.getContext("2d");
+        const scoreDisplay = document.getElementById("score");
+        const gameOverDisplay = document.getElementById("gameOver");
+
+        let score = 0;
+        let gameRunning = true;
+
+        let circle = {
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            radius: 30,
+            color: "#74ebd5"
+        };
+
+        function drawCircle() {
+            ctx.beginPath();
+            ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+            ctx.fillStyle = circle.color;
+            ctx.fill();
+            ctx.closePath();
+        }
+
+        function updateCircle() {
+            circle.x = Math.random() * (canvas.width - 2 * circle.radius) + circle.radius;
+            circle.y = Math.random() * (canvas.height - 2 * circle.radius) + circle.radius;
+        }
+
+        function drawGame() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawCircle();
+        }
+
+        canvas.addEventListener("click", (event) => {
+            const rect = canvas.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const clickY = event.clientY - rect.top;
+
+            const distance = Math.sqrt(
+                (clickX - circle.x) ** 2 + (clickY - circle.y) ** 2
+            );
+
+            if (distance < circle.radius && gameRunning) {
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+                updateCircle();
+                drawGame();
+            } else {
+                gameOver();
+            }
+        });
+
+        function gameOver() {
+            gameRunning = false;
+            gameOverDisplay.style.display = "block";
+        }
+
+        function startGame() {
+            score = 0;
+            gameRunning = true;
+            gameOverDisplay.style.display = "none";
+            scoreDisplay.textContent = `Score: ${score}`;
+            updateCircle();
+            drawGame();
+        }
+
+        startGame();
+    </script>
+</body>
+</html>
